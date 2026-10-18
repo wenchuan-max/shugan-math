@@ -1,9 +1,10 @@
 window.Labs=(()=>{
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const C={mint:'#a9dfb7',orange:'#efb16f',blue:'#a6b3ee',muted:'#7ea199',grid:'#2c4849',ink:'#e0efe3'},PI=Math.PI, fmt=(n,d=3)=>Number.isFinite(n)?(+n.toFixed(d)).toString():'无定义';
-const text=(x,y,t,c=C.muted,size=12,anchor='middle')=>`<text x="${x}" y="${y}" fill="${c}" font-size="${size}" text-anchor="${anchor}" font-family="Segoe UI,Microsoft YaHei,sans-serif">${t}</text>`;
+const text=(x,y,t,c=C.muted,size=12,anchor='middle')=>`<text x="${x}" y="${y}" fill="${c}" font-size="${size}" text-anchor="${anchor}" font-family="Segoe UI,Microsoft YaHei,sans-serif">${esc(t)}</text>`;
 const line=(x1,y1,x2,y2,c=C.grid,w=1,dash='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
 const dot=(x,y,c=C.orange,r=5)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`;
-function svg(body,label='数学互动图形',height=380){return `<svg viewBox="0 0 640 ${height}" role="img" aria-label="${label}">${body}</svg>`}
+function svg(body,label='数学互动图形',height=380){return `<svg viewBox="0 0 640 ${height}" role="img" aria-label="${esc(label)}">${body}</svg>`}
 function graph(series,o={},extra){let xmin=o.xmin??-4,xmax=o.xmax??4,ymin=o.ymin??-3,ymax=o.ymax??5;const X=x=>50+(x-xmin)/(xmax-xmin)*550,Y=y=>335-(y-ymin)/(ymax-ymin)*300;let b='<defs><clipPath id="plotClip"><rect x="50" y="35" width="550" height="300"/></clipPath></defs>';
 for(let i=0;i<=8;i++){let x=xmin+(xmax-xmin)*i/8;b+=line(X(x),35,X(x),335);if(i%2===0)b+=text(X(x),359,o.pi?piLabel(x):fmt(x,1));}
 for(let i=0;i<=6;i++){let y=ymin+(ymax-ymin)*i/6;b+=line(50,Y(y),600,Y(y));if(i%2===0)b+=text(38,Y(y)+4,fmt(y,1),C.muted,10,'end');}
@@ -38,8 +39,8 @@ else if(['angle','trig','induction','wave','identity','transform','ferris'].incl
  if(type==='transform')controls=range('A','振幅 A',.5,3,.25,1)+range('omega','角频率 ω',.5,3,.25,1)+range('phase','相位 φ（以π为单位）',-1,1,.125,0)+range('angle','观察位置 x（度）',-180,360,15,30);
  if(type==='ferris'){controls=range('t','时间 t（秒）',0,120,1,0)+'<button data-action="play">播放摩天轮 ▶</button>';note='半径20米，中心离地25米，60秒一圈，从最低点出发。';}
 }
-host.innerHTML=`<div class="lab-layout"><div class="lab-scene"></div><div class="lab-controls">${controls}</div></div><div class="lab-stats" aria-live="polite"></div><div class="lab-note">${note}</div>`;
-const scene=host.querySelector('.lab-scene'),stats=host.querySelector('.lab-stats');const stat=(label,value)=>`<span>${label} <b>${value}</b></span>`;
+host.innerHTML=`<div class="lab-layout"><div class="lab-scene"></div><div class="lab-controls">${controls}</div></div><div class="lab-stats" aria-live="polite"></div><div class="lab-note">${esc(note)}</div>`;
+const scene=host.querySelector('.lab-scene'),stats=host.querySelector('.lab-stats');const stat=(label,value)=>`<span>${esc(label)} <b>${esc(value)}</b></span>`;
 function update(){let h='',v='';const deg=s.angle*PI/180,funcs={linear:x=>x,square:x=>x*x,cube:x=>x*x*x,sqrt:x=>x<0?NaN:Math.sqrt(x),reciprocal:x=>x===0?NaN:1/x};
 if(type==='sets'){
  const A=s.Aset,B=s.Bset,U=[1,2,3,4,5,6,7,8];const pick=s.op==='intersection'?U.filter(x=>A.includes(x)&&B.includes(x)):s.op==='union'?U.filter(x=>A.includes(x)||B.includes(x)):U.filter(x=>!A.includes(x));let b=`<rect x="40" y="35" width="560" height="295" rx="18" fill="#ffffff04" stroke="#54756c"/>`+text(65,62,'U',C.muted,12)+`<circle cx="255" cy="180" r="105" fill="${s.op==='union'?'#a9dfb725':'#a9dfb70d'}" stroke="${C.mint}" stroke-width="2"/><circle cx="385" cy="180" r="105" fill="${s.op==='union'?'#a6b3ee25':'#a6b3ee0c'}" stroke="${C.blue}" stroke-width="2"/>`+text(207,100,'A',C.mint,20)+text(432,100,'B',C.blue,20);let counts={a:0,b:0,ab:0,out:0};for(const n of U){let k=A.includes(n)&&B.includes(n)?'ab':A.includes(n)?'a':B.includes(n)?'b':'out',j=counts[k]++,x=k==='a'?198+(j%2)*28:k==='b'?414+(j%2)*28:k==='ab'?308+(j%2)*26:84+j*66,y=k==='out'?310:k==='ab'?138+Math.floor(j/2)*27:140+Math.floor(j/2)*30;b+=dot(x,y,pick.includes(n)?C.orange:'#28494a',13)+text(x,y+4,n,pick.includes(n)?'#17352e':C.ink,11);}
