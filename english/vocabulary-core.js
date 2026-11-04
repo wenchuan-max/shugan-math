@@ -3,8 +3,36 @@ function compare(expected,actual){let a=Array.from(normal(expected)),b=Array.fro
 function grade(w,actual){const accepted=[w.word,...w.aliases],target=accepted.find(a=>normal(a)===normal(actual))||w.word;return{...compare(target,actual),expected:target,variant:normal(target)!==normal(w.word)};}
 function mask(w,level){if(+level===4)return'';const chars=Array.from(w.word),indices=[],keep=new Set();for(let i=0;i<chars.length;i++)if(/[\p{L}\p{N}]/u.test(chars[i])){indices.push(i);if(i===0||!/[\p{L}\p{N}]/u.test(chars[i-1]))keep.add(i);}let candidates=indices.filter(i=>!keep.has(i)),seed=parseInt(C.hash(w.id),36);for(let i=candidates.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;let j=seed%(i+1);[candidates[i],candidates[j]]=[candidates[j],candidates[i]];}let count=level===3?candidates.length:Math.min(candidates.length,level===2?Math.ceil(indices.length*.6):Math.max(1,Math.floor(indices.length*.25))),hide=new Set(candidates.slice(0,count));return chars.map((c,i)=>hide.has(i)?'＿':c).join('');}
 function evidence(record){const h=record?.history?.slice(-3)||[];if(!h.length)return null;let n=0,d=0;h.slice().reverse().forEach((a,i)=>{let weight=2**(-i);n+=Math.min(a.assisted?75:100,a.accuracy)*weight;d+=weight;});return Math.round(n/d);}
-function schedule(old,result,assisted,now=Date.now()){let streak=result.correct&&!assisted?(old?.streak||0)+1:0,days=streak?[1,3,7,14,30][Math.min(streak-1,4)]:0;return{streak,due:now+days*86400000,history:[...(old?.history||[]),{correct:result.correct,accuracy:result.accuracy,assisted:!!assisted,date:now}].slice(-3)};}
+function schedule(old,result,assisted,now=Date.now()){
+  const independent=result.correct&&!assisted;
+  const early=independent&&old?.streak>0&&old.due>now;
+  const streak=independent?(old?.streak||0)+(early?0:1):0;
+  const days=streak?[1,3,7,14,30][Math.min(streak-1,4)]:0;
+  return{streak,due:early?old.due:now+days*86400000,history:[...(old?.history||[]),{correct:result.correct,accuracy:result.accuracy,assisted:!!assisted,date:now}].slice(-3)};
+}
+function recordSpelling(state,word,result,assisted,now=Date.now()){
+  state.vocabRecords??={};
+  const record=schedule(state.vocabRecords[word.id],result,assisted,now);
+  state.vocabRecords[word.id]=record;
+  if(result.correct&&!assisted&&state.vocabMarks)delete state.vocabMarks[word.id];
+  return record;
+}
 function stats(state,items=words){const studied=items.filter(w=>evidence(state.vocabRecords?.[w.id])!==null),weak=studied.filter(w=>evidence(state.vocabRecords[w.id])<80),due=items.filter(w=>state.vocabMarks?.[w.id]||state.vocabRecords?.[w.id]?.history?.length&&state.vocabRecords[w.id].due<=Date.now());return{total:items.length,studied:studied.length,weak:weak.length,due:due.length,value:studied.length?Math.round(studied.reduce((n,w)=>n+evidence(state.vocabRecords[w.id]),0)/studied.length):null};}
-function filter(state,p={}){const q=normal(p.search||'');return words.filter(w=>(!p.book||w.bookId===p.book)&&(!p.unit||w.lessonId===p.unit)&&(!p.type||w.category===p.type)&&(!q||normal(w.word+' '+w.meaning+' '+w.aliases.join(' ')).includes(q))&&(!p.scope||p.scope==='marked'&&state.vocabMarks?.[w.id]||p.scope==='wrong'&&state.vocabRecords?.[w.id]?.history?.at(-1)?.correct===false||p.scope==='due'&&(state.vocabMarks?.[w.id]||state.vocabRecords?.[w.id]?.history?.length&&state.vocabRecords[w.id].due<=Date.now())));}
-window.EnglishVocabulary={words,byId,normal,grade,mask,stats,filter,evidence,schedule,sources:D.sources};
+function filter(state,p={},now=Date.now()){const q=normal(p.search||'');return words.filter(w=>(!p.book||w.bookId===p.book)&&(!p.unit||w.lessonId===p.unit)&&(!p.type||w.category===p.type)&&(!q||normal(w.word+' '+w.meaning+' '+w.aliases.join(' ')).includes(q))&&(!p.scope||p.scope==='marked'&&state.vocabMarks?.[w.id]||p.scope==='wrong'&&state.vocabRecords?.[w.id]?.history?.at(-1)?.correct===false||p.scope==='due'&&(state.vocabMarks?.[w.id]||state.vocabRecords?.[w.id]?.history?.length&&state.vocabRecords[w.id].due<=now)));}
+function practiceWords(state,filters={},now=Date.now()){
+  const review=[],newWords=[];
+  for(const word of filter(state,filters,now)){
+    const record=state.vocabRecords?.[word.id],latest=record?.history?.at(-1);
+    const marked=!!state.vocabMarks?.[word.id];
+    if(marked||latest&&record.due<=now){
+      const priority=latest&&(!latest.correct||latest.assisted)?0:marked?1:2;
+      review.push({word,priority,due:record?.due??now});
+    }else if(!latest){
+      newWords.push(word);
+    }
+  }
+  review.sort((a,b)=>a.priority-b.priority||a.due-b.due);
+  return{review:review.length,newWords:newWords.length,queue:[...review.map(item=>item.word),...newWords].slice(0,10)};
+}
+window.EnglishVocabulary={words,byId,normal,grade,mask,stats,filter,evidence,schedule,recordSpelling,practiceWords,sources:D.sources};
 })();
