@@ -6,7 +6,7 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[character]);
   const labels = {correct: '独立拼对', assisted: '用了提示', wrong: '拼写有误', skipped: '这次没想起'};
-  const glossaryFilters = ['book', 'unit', 'type', 'scope', 'search'];
+  const glossaryFilters = ['book', 'unit', 'type', 'scope', 'search', 'word'];
 
   const partsOfSpeech = {n: '名词', v: '动词', vt: '及物动词', vi: '不及物动词', adj: '形容词',
     adv: '副词', prep: '介词', pron: '代词', det: '限定词', conj: '连词', num: '数词', int: '感叹词'};
@@ -53,7 +53,7 @@
       const book = C.books.find(item => item.id === selected.book);
       const range = [
         lesson ? unitName({lessonId: lesson.id, bookId: lesson.bookId}) : book?.title || '全部七册',
-        selected.type, {due: '只练待复习词', wrong: '只练最近错词', marked: '只练标记词'}[selected.scope],
+        selected.word && V.byId.get(selected.word)?.word, selected.type, {due: '只练待复习词', wrong: '只练最近错词', marked: '只练标记词'}[selected.scope],
         selected.search && '查找「' + selected.search + '」'
       ].filter(Boolean).join(' / ');
       const inProgress = round && round.index < round.ids.length;
