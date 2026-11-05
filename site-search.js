@@ -5,10 +5,10 @@
   const version = scriptUrl.searchParams.get('v');
   const topbar = document.querySelector('.topbar');
   if (!topbar || typeof HTMLDialogElement === 'undefined') return;
-  const subjects = {math:'数学', english:'英语', chinese:'语文'};
-  const paths = {math:'index.html', english:'english/index.html', chinese:'chinese/index.html'};
+  const subjects = {math:'数学', english:'英语', chinese:'语文', physics:'物理'};
+  const paths = {math:'index.html', english:'english/index.html', chinese:'chinese/index.html', physics:'physics/index.html'};
   const currentSubject = document.body.dataset.subject || 'math';
-  const suggestions = ['二次函数', 'exchange', '落霞与孤鹜齐飞', '城南旧事'];
+  const suggestions = ['二次函数', 'exchange', '落霞与孤鹜齐飞', '城南旧事', '平抛运动'];
   const pageSize = 12;
   const icon = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg>';
   const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -30,11 +30,11 @@
   const dialog = document.createElement('dialog');
   dialog.className = 'site-search';
   dialog.setAttribute('aria-labelledby', 'site-search-title');
-  dialog.innerHTML = '<div class="site-search-header"><div><p>数学 · 英语 · 语文</p>' +
+  dialog.innerHTML = '<div class="site-search-header"><div><p>数学 · 英语 · 语文 · 物理</p>' +
     '<h2 id="site-search-title">全站搜索</h2></div>' +
     '<button type="button" data-site-close aria-label="关闭搜索">×</button></div>' +
     '<form class="site-search-form" role="search">' + icon +
-    '<input type="search" aria-label="搜索三科内容" placeholder="输入知识点、单词、诗句或书名" maxlength="80" autocomplete="off" autofocus>' +
+    '<input type="search" aria-label="搜索站内课程与资料" placeholder="输入知识点、单词、诗句或书名" maxlength="80" autocomplete="off" autofocus>' +
     '</form><div class="site-search-filters" role="group" aria-label="筛选科目">' +
     Object.entries({all:'全部科目', ...subjects}).map(([id, label]) =>
       '<button type="button" data-site-subject="' + id + '" aria-pressed="' + (id === 'all') + '">' + label + '</button>').join('') +

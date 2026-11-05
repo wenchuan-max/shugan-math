@@ -1,0 +1,99 @@
+body[data-subject="physics"] { --ph-ink:#172d44; --ph-main:#274f73; --ph-line:#d7e2eb; --ph-pale:#ebf3f8; }
+.ph-page { padding-top:36px; padding-bottom:60px; color:var(--ph-ink); }
+.ph-narrow { max-width:850px; }
+.ph-page h1,.ph-page h2,.ph-page h3 { color:var(--ph-ink); overflow-wrap:anywhere; }
+.ph-heading { padding:25px 0 24px; }
+.ph-heading h1 { font-size:clamp(32px,5vw,56px); margin:10px 0; line-height:1.23; }
+.ph-page p { line-height:1.8; overflow-wrap:anywhere; }
+.ph-heading p { max-width:60ch; color:#4f6275; margin:8px 0 0; }
+.ph-page .btn.primary { background:var(--ph-main); color:white; }
+.ph-page .btn.ghost { border-color:#b3c9db; color:#254862; }
+.ph-page a:not(.btn) { text-underline-offset:3px; }
+.ph-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(22px,5vw,68px); align-items:center; padding:40px 0; }
+.ph-hero h1 { font-size:clamp(48px,8.5vw,96px); letter-spacing:-.045em; line-height:1.05; margin:16px 0 20px; }
+.ph-hero h1 em { font-style:normal; color:#3d6387; }
+.ph-hero p { max-width:38ch; font-size:16px; color:#425b70; }
+.ph-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.ph-hero-stats { display:flex; flex-wrap:wrap; gap:10px 20px; color:#506477; margin-top:20px; }
+.ph-hero-stats strong { color:var(--ph-main); font-size:22px; }
+.ph-hero-figure {
+  display:grid; gap:14px; min-width:0; padding:clamp(16px,3vw,32px);
+  border-radius:25px; border:1px solid #dae5ef; background:#e8f1f8; color:var(--ph-ink);
+  box-shadow:8px 8px 0 #dbe7f0;
+}
+.ph-hero-figure strong { font-size:clamp(20px,4vw,31px); }
+.ph-hero-figure .ph-chart { border:1px solid #d3e1ec; border-radius:14px; padding:8px; background:#fafdff; }
+.ph-section { margin:30px 0; }
+.ph-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.ph-books { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.ph-book,.ph-link-card,.ph-panel { border:1px solid var(--ph-line); border-radius:17px; background:#fffefa; min-width:0; padding:20px; }
+.ph-book { display:grid; gap:7px; background:linear-gradient(150deg,#e6eff7,#fffefa); }
+.ph-book:nth-child(n+4) { background:linear-gradient(150deg,#e2eef0,#fffefa); }
+.ph-book>strong { color:#567fa0; font:44px Georgia,serif; }
+.ph-book h3,.ph-link-card h3,.ph-panel h2 { margin:7px 0; }
+.ph-book p,.ph-link-card p { margin:0; color:#455c70; font-size:13px; }
+.ph-book:hover,.ph-link-card:hover { border-color:#6188a6; }
+.ph-link-card { display:block; }
+.ph-link-card>span:last-child { display:block; margin-top:10px; font-size:13px; color:#365d7c; }
+.ph-panel { margin:12px 0; }
+.ph-grid>.ph-panel { margin:0; }
+.ph-chapter-grid { grid-template-columns:minmax(0, .9fr) minmax(0,1.1fr); align-items:start; }
+.ph-lesson-list { list-style:none; margin:14px 0; padding:0; }
+.ph-lesson-list li { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 12px; border-bottom:1px solid var(--ph-line); padding:11px 0; }
+.ph-lesson-list a,.ph-paper a,.ph-reference a { text-decoration:underline; color:#264f72; }
+.ph-lesson-list small { color:#546b7d; }
+.ph-chart-frame { background:#f3f8fc; border-radius:12px; padding:8px; margin:16px 0 14px; }
+.ph-chart-frame p { margin:3px 0; font-size:12px; color:#37536b; }
+.ph-chart { display:block; width:100%; height:auto; overflow:visible; }
+.ph-chart text { font:14px system-ui,sans-serif; fill:#496479; }
+.ph-grid.ph-chapter-grid .ph-experiment { padding:20px; }
+.ph-chart .ph-chart-grid path { stroke:#cbdbe7; stroke-width:1; }
+.ph-axis { fill:none; stroke:#537189; stroke-width:1.2; }
+.ph-curve { stroke:#2c608b; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.ph-marker { stroke:#aa5e36; stroke-width:1.5; stroke-dasharray:5 4; }
+.ph-marker-dot { fill:#a65026; stroke:white; stroke-width:2; }
+.ph-range { display:block; margin:8px 0; font-weight:600; }
+#ph-slider { width:100%; height:28px; accent-color:#325c7e; }
+#ph-measure { display:block; font-weight:700; color:#254862; margin:8px 0 16px; }
+.ph-page summary { cursor:pointer; color:#284f70; }
+.ph-concept { display:grid; gap:14px; }
+.ph-concept p { margin:8px 0; }
+.ph-rule { background:#edf3f8; border-radius:12px; padding:12px; }
+.ph-question h2 { line-height:1.55; font-size:clamp(18px,4vw,24px); }
+.ph-question fieldset { padding:0; margin:10px 0 16px; border:0; min-width:0; }
+.ph-option { display:flex; align-items:center; gap:10px; padding:12px; margin:7px 0; border:1px solid var(--ph-line); border-radius:10px; cursor:pointer; }
+.ph-option:has(:checked) { border-color:#457599; background:#ebf3fa; }
+.ph-option input { flex-shrink:0; accent-color:#315b7e; }
+.ph-option span { overflow-wrap:anywhere; }
+.ph-option.right,.ph-feedback.right { background:#e8f4ec; border-color:#74a98a; }
+.ph-option.wrong,.ph-feedback.wrong { background:#fff0e5; border-color:#c87d52; }
+.ph-feedback { border:1px solid; border-radius:12px; padding:12px; margin:10px 0 15px; }
+.ph-feedback p { margin:4px 0; }
+.ph-reference { color:#4b6275; font-size:13px; }
+.ph-rating { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 20px; }
+.ph-rating button { width:42px; height:42px; border:1px solid #bacddd; border-radius:10px; background:white; color:#244a67; cursor:pointer; }
+.ph-rating button[aria-pressed="true"] { color:white; background:var(--ph-main); border-color:var(--ph-main); }
+.ph-note { display:grid; gap:8px; }
+.ph-note textarea,.ph-filter input,.ph-filter select { width:100%; border:1px solid #bdcddd; border-radius:9px; padding:8px 10px; background:white; color:inherit; font:inherit; }
+.ph-note textarea { min-height:110px; resize:vertical; }
+.ph-note-text { white-space:pre-wrap; }
+.ph-filter { display:flex; flex-wrap:wrap; gap:10px; align-items:end; margin:15px 0; padding:12px; border:1px solid var(--ph-line); border-radius:12px; background:#f5f8fb; }
+.ph-filter label { display:grid; gap:5px; flex:1 1 140px; min-width:0; font-size:13px; }
+.ph-filter button { padding:9px 12px; }
+.ph-filter>a { align-self:center; color:#365b77; }
+.ph-mastery summary { display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:space-between; }
+.ph-mastery summary strong { color:var(--ph-main); }
+.ph-spacer { margin:18px 0; }
+.ph-import { display:grid; gap:6px; max-width:100%; }
+.ph-import input { max-width:100%; }
+@media(max-width:850px) { .ph-books { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:620px) {
+  .ph-page { padding-top:23px; }
+  .ph-hero,.ph-grid,.ph-chapter-grid { grid-template-columns:1fr; }
+  .ph-hero { padding:15px 0; }
+  .ph-panel,.ph-book,.ph-link-card { padding:14px; }
+  .ph-book>strong { font-size:33px; }
+  .ph-heading { padding:19px 0; }
+  .ph-grid.ph-chapter-grid .ph-experiment { padding:13px; }
+  .ph-filter select,.ph-filter input,.ph-note textarea { font-size:16px; }
+}

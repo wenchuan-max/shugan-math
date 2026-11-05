@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f4ed">
+  <meta name="description" content="人教版高中物理六册，按章节看图、拖动实验、完成自测，用自评和错题找薄弱点。">
+  <title>先看见，再算清 · 物理</title>
+  <link rel="icon" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../style.css?v=7.0.0">
+  <link rel="stylesheet" href="../subjects.css?v=7.0.0">
+  <link rel="stylesheet" href="../site-search.css?v=7.0.0">
+  <link rel="stylesheet" href="physics.css?v=7.0.0">
+  <script defer src="curriculum.js?v=7.0.0"></script>
+  <script defer src="papers.js?v=7.0.0"></script>
+  <script defer src="exam-guides.js?v=7.0.0"></script>
+  <script defer src="core.js?v=7.0.0"></script>
+  <script defer src="models.js?v=7.0.0"></script>
+  <script defer src="app.js?v=7.0.0"></script>
+  <script defer src="../subjects.js?v=7.0.0"></script>
+  <script defer src="../site-search.js?v=7.0.0"></script>
+</head>
+<body data-subject="physics">
+  <a class="skip" href="#main">跳到学习内容</a>
+  <header class="topbar">
+    <a class="brand" href="#home"><span class="brand-mark">φ</span>物感</a>
+    <nav aria-label="物理主导航">
+      <a href="#home" data-nav="home">六册课程</a>
+      <a href="#bank" data-nav="bank">题库</a>
+      <a href="#papers" data-nav="papers">各地原卷</a>
+      <a href="#mastery" data-nav="mastery">掌握情况</a>
+      <a href="#review" data-nav="review">错题与笔记</a>
+    </nav>
+    <span class="book-badge">人教版 · 高中物理</span>
+    <button id="ph-menu" class="icon-btn mobile-toggle" aria-label="展开物理导航" aria-expanded="false">☰</button>
+  </header>
+  <div id="app"><main id="main"><p class="loading">正在打开物理课程……</p></main></div>
+  <footer class="footer">
+    <span>物感 / 先看见，再算清。</span>
+    <span id="ph-save" role="status">记录保存在此浏览器</span>
+    <a href="#sources">教材与试卷来源 ↗</a>
+  </footer>
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>
