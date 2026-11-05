@@ -5,10 +5,10 @@
   const version = scriptUrl.searchParams.get('v');
   const topbar = document.querySelector('.topbar');
   if (!topbar || typeof HTMLDialogElement === 'undefined') return;
-  const subjects = {math:'数学', english:'英语', chinese:'语文', physics:'物理'};
-  const paths = {math:'index.html', english:'english/index.html', chinese:'chinese/index.html', physics:'physics/index.html'};
+  const subjects = {math:'数学', english:'英语', chinese:'语文', physics:'物理', chemistry:'化学', biology:'生物'};
+  const paths = {math:'index.html', english:'english/index.html', chinese:'chinese/index.html', physics:'physics/index.html', chemistry:'chemistry/index.html', biology:'biology/index.html'};
   const currentSubject = document.body.dataset.subject || 'math';
-  const suggestions = ['二次函数', 'exchange', '落霞与孤鹜齐飞', '城南旧事', '平抛运动'];
+  const suggestions = ['二次函数', 'exchange', '落霞与孤鹜齐飞', '城南旧事', '平抛运动', '中和滴定', '光合作用'];
   const pageSize = 12;
   const icon = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg>';
   const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -30,7 +30,7 @@
   const dialog = document.createElement('dialog');
   dialog.className = 'site-search';
   dialog.setAttribute('aria-labelledby', 'site-search-title');
-  dialog.innerHTML = '<div class="site-search-header"><div><p>数学 · 英语 · 语文 · 物理</p>' +
+  dialog.innerHTML = '<div class="site-search-header"><div><p>数学 · 英语 · 语文 · 物理 · 化学 · 生物</p>' +
     '<h2 id="site-search-title">全站搜索</h2></div>' +
     '<button type="button" data-site-close aria-label="关闭搜索">×</button></div>' +
     '<form class="site-search-form" role="search">' + icon +

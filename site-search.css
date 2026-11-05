@@ -75,3 +75,5 @@
   .site-search-filters { padding:11px 12px 9px; }
   .site-search-body { padding:0 12px 14px; }
 }
+
+.site-search-tag[data-site-kind="chemistry"]{background:#f0e5f3;color:#6b3d7a}.site-search-tag[data-site-kind="biology"]{background:#e5f1e6;color:#346945}
