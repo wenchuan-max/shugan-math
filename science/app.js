@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const S=window.ScienceSubject, C=S.core, M=S.visuals;
+  const S=window.ScienceSubject, C=S.core, M=S.visuals, T=S.textbook;
   const subject=S.name, booksText=C.books.length===6?'六册':'五册';
   const [headlineA,headlineB]=S.headline;
   const $=selector=>document.querySelector(selector);
@@ -34,6 +34,8 @@
   const heading=(eyebrow,title,subtitle='')=>'<header class="ph-heading"><span class="eyebrow">'+E(eyebrow)+'</span><h1>'+E(title)+'</h1>'+(subtitle?'<p>'+E(subtitle)+'</p>':'')+'</header>';
   const page=(body,extra='')=>'<main class="container ph-page '+extra+'" id="main" tabindex="-1">'+body+'</main>';
   const locationOf=lesson=>B(lesson.bookId).title+' · 第 '+H(lesson.chapterId).code+' 章';
+  const pageLabel=(start,end=start)=>'第 '+start+(start===end?'':'–'+end)+' 页';
+  const lessonPages=lesson=>T?.lessons[lesson.id];
   const searchForm=(view,p,fields)=>'<form class="ph-filter" data-ph-filter="'+view+'">'+
     fields.map(([name,label,options])=>'<label>'+label+'<select name="'+name+'"><option value="">全部</option>'+
       options.map(([value,title])=>'<option value="'+E(value)+'" '+(p.get(name)===value?'selected':'')+'>'+E(title)+'</option>').join('')+'</select></label>').join('')+
@@ -45,7 +47,8 @@
   function chapterCard(chapter) {
     const count=chapter.lessons.filter(lesson=>C.evidence(state,lesson.id).value!==null).length;
     return '<a class="ph-link-card" href="#chapter/'+chapter.id+'"><span class="small-label">第 '+chapter.code+' 章 · '+
-      count+'/'+chapter.lessons.length+' 节已有记录</span><h3>'+E(chapter.name)+'</h3><p>'+E(chapter.summary)+'</p><span>打开章节 ↗</span></a>';
+      count+'/'+chapter.lessons.length+' 节已有记录'+(T?' · '+pageLabel(T.chapters[chapter.id].start,T.chapters[chapter.id].end):'')+
+      '</span><h3>'+E(chapter.name)+'</h3><p>'+E(chapter.summary)+'</p><span>打开章节 ↗</span></a>';
   }
 
   function home() {
@@ -64,18 +67,39 @@
       '<a class="ph-link-card" href="#papers"><h3>按地区找原卷</h3><p>2022—2026，广东卷优先，另有全国及地区卷。</p></a></div>');
   }
 
-  function bookPage(book) {
-    return page(btn('#home','← '+booksText+'路线','ghost')+heading('人教版 · 学习路线',book.title,book.caption)+
-      '<div class="ph-grid">'+book.chapters.map(chapterCard).join('')+'</div>');
+  function findBookPage(book,shelf,p) {
+    const wanted=p.get('page');
+    const printedPage=Number(wanted);
+    const match=Number.isInteger(printedPage)?shelf.pages.find(entry=>entry.start<=printedPage&&entry.end>=printedPage):null;
+    const result=wanted===null?'':'<div class="ph-page-match" id="ph-book-match" tabindex="-1">'+
+      (match?'<span class="small-label">'+pageLabel(match.start,match.end)+'</span><h3>'+
+        (match.link?'<a href="'+E(match.link)+'">'+E(match.title)+' ↗</a>':E(match.title))+'</h3>'+
+        (match.note?'<p>'+E(match.note)+'</p>':''):'<p>请输入 1 到 '+shelf.lastPage+' 之间的整数页码。</p>')+'</div>';
+    return '<section class="ph-panel ph-page-lookup" aria-labelledby="ph-find-page"><h2 id="ph-find-page">按书上页码找</h2>'+
+      '<form class="ph-page-form" data-ph-filter="book/'+book.id+'"><label for="ph-printed-page">印刷页码（1–'+shelf.lastPage+'）</label>'+
+      '<input id="ph-printed-page" type="number" name="page" min="1" max="'+shelf.lastPage+'" required inputmode="numeric" value="'+E(wanted)+'">'+
+      '<button class="btn primary" type="submit">找这一页</button></form>'+result+'</section>';
   }
 
-  function experiment(chapter) {
-    const m=M.models[chapter.model], [min,max,step]=m.range;
+  function bookPage(book,p) {
+    const shelf=T?.books[book.id];
+    return page(btn('#home','← '+booksText+'路线','ghost')+heading('人教版 · 学习路线',book.title,book.caption)+
+      (shelf?findBookPage(book,shelf,p):'')+'<div class="ph-grid">'+book.chapters.map(chapterCard).join('')+'</div>'+
+      (shelf?'<section class="ph-panel ph-book-extras"><h2>课题研究与附录</h2>'+shelf.supplements.map(item=>
+        '<details><summary>'+E(item.title)+' <small>'+pageLabel(item.start,item.end)+'</small></summary><p>'+E(item.note)+'</p></details>'
+      ).join('')+'</section>':''));
+  }
+
+  function experiment(modelId) {
+    const m=M.models[modelId], [min,max,step]=m.range;
     const initial=m.initial??Number((min+step*Math.floor((max-min)/step/2)).toFixed(3));
-    return '<section class="ph-panel ph-experiment" aria-label="交互实验"><span class="small-label">先猜 → 拖动 → 解释</span>'+
-      '<h2>'+E(m.title)+'</h2><p>'+E(m.predict)+'</p><div class="ph-chart-frame"><p>'+E(m.kind==='stages'?'拖动滑块，按顺序比较':'纵轴：'+m.y)+'</p>'+
-      '<div id="ph-chart">'+M.chart(chapter.model,initial)+'</div><p>'+E(m.kind==='stages'?'':'横轴：'+m.x)+'</p></div>'+
-      '<label class="ph-range" for="ph-slider">'+E(m.x)+'</label><input id="ph-slider" type="range" data-model="'+chapter.model+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+initial+'">'+
+    const stages=m.kind==='stages', schematic=m.kind==='diagram';
+    return '<section class="ph-panel ph-experiment" aria-label="交互实验">'+
+      '<h2>'+E(m.title)+'</h2><p>'+E(m.predict)+'</p><div class="ph-chart-frame">'+
+      (schematic?'':'<p>'+E(stages?'拖动滑块，按顺序比较':'纵轴 · '+m.y)+'</p>')+
+      '<div id="ph-chart">'+M.chart(modelId,initial)+'</div>'+
+      (stages||schematic?'':'<p>'+E('横轴 · '+m.x)+'</p>')+(m.caption?'<p>'+E(m.caption)+'</p>':'')+'</div>'+
+      '<label class="ph-range" for="ph-slider">'+E(m.x)+'</label><input id="ph-slider" type="range" data-model="'+modelId+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+initial+'">'+
       '<output id="ph-measure" for="ph-slider">'+E(measurement(m,initial))+'</output><details><summary>看现象怎么解释</summary><p>'+E(m.why)+'</p></details></section>';
   }
 
@@ -85,13 +109,21 @@
   }
 
   function chapterPage(chapter) {
+    const guide=T?.chapters[chapter.id];
     return page(btn('#book/'+chapter.bookId,'← '+B(chapter.bookId).title,'ghost')+
-      heading('第 '+chapter.code+' 章',chapter.name,chapter.summary)+
+      heading('第 '+chapter.code+' 章'+(guide?' · '+pageLabel(guide.start,guide.end):''),chapter.name,chapter.summary)+
       '<div class="ph-grid ph-chapter-grid"><section class="ph-panel"><h2>逐节学</h2><ol class="ph-lesson-list">'+
-      chapter.lessons.map(lesson=>'<li><a href="#lesson/'+lesson.id+'">'+E(lesson.title)+'</a><small>'+
-      (C.evidence(state,lesson.id).value===null?'待学':'已有记录')+'</small></li>').join('')+'</ol>'+
+      chapter.lessons.map(lesson=>{
+        const pages=lessonPages(lesson);
+        return '<li><a href="#lesson/'+lesson.id+'">'+E(lesson.title)+'</a><small>'+
+          (pages?pageLabel(pages.start,pages.end)+' · ':'')+
+          (C.evidence(state,lesson.id).value===null?'待学':'已有记录')+'</small></li>';
+      }).join('')+'</ol>'+
       '<div class="ph-actions"><button class="btn primary" data-ph-start="'+chapter.id+'">抽题练本章</button>'+btn('#bank?chapter='+chapter.id,'本章题库','ghost')+'</div></section>'+
-      experiment(chapter)+'</div>');
+      experiment(chapter.model)+'</div>'+
+      (guide?'<section class="ph-panel ph-book-review" id="ph-book-review" tabindex="-1"><span class="small-label">课本 '+pageLabel(guide.review,guide.end)+
+        '</span><h2>复习与提高</h2><p>先做课本 A 组。遇到不会的题，把用到的量和方向标在图上，再回这一节。拿下 A 组后，用 B 组练习把几节的知识连起来。</p>'+
+        btn('#bank?chapter='+chapter.id,'查这一章的练习','ghost')+'</section>':''));
   }
 
   function answerBox(question,mode,selected) {
@@ -116,16 +148,31 @@
       '卷第 '+question.number+' 题 ↗</a>'+(question.page?' · PDF 第 '+question.page+' 页':'')+'</p>';
   }
 
+  function textbookSteps(material) {
+    const activity=material.activity;
+    return '<section class="ph-panel ph-textbook-steps"><h2>跟课本学</h2><ol>'+
+      material.steps.map(step=>'<li>'+E(step)+'</li>').join('')+'</ol>'+
+      '<details class="ph-textbook-reveal"><summary><span>学完自查</span>'+E(material.question)+'</summary><p>'+E(material.answer)+'</p></details></section>'+
+      (activity?'<section class="ph-panel ph-book-activity"><span class="small-label">'+E(['课本'+activity.label,pageLabel(activity.page)].join(' · '))+
+        '</span><h2>'+E(activity.title)+'</h2><p>'+E(activity.prompt)+'</p>'+
+        '<details class="ph-textbook-reveal"><summary>看一步提示</summary><p>'+E(activity.hint)+'</p></details>'+
+        '<details class="ph-textbook-reveal"><summary>展开解法</summary><p>'+E(activity.answer)+'</p></details></section>':'');
+  }
+
   function lessonPage(lesson) {
     const chapter=H(lesson.chapterId), index=chapter.lessons.indexOf(lesson), question=Q(lesson.id);
     const selected=retry.has(question.id)?undefined:C.latest(state,question);
     const guide=C.questions.filter(item=>item.kind==='guide'&&item.lessonId===lesson.id);
-    const next=chapter.lessons[index+1];
+    const next=chapter.lessons[index+1], material=lessonPages(lesson);
     if(state.last!==lesson.id) { state.last=lesson.id; save(); }
     return page(btn('#chapter/'+chapter.id,'← '+chapter.name,'ghost')+heading(locationOf(lesson)+' · 第 '+(index+1)+' 节',lesson.title)+
+      (material?'<p class="ph-reference ph-textbook-link">对应课本 <a href="#book/'+lesson.bookId+'?page='+material.start+'">'+
+        pageLabel(material.start,material.end)+'</a></p>':'')+
       '<section class="ph-panel ph-concept"><div><span class="small-label">01 先想一个画面</span><h2>先看发生了什么</h2><p>'+E(lesson.scene)+'</p></div>'+
       '<div class="ph-rule"><span class="small-label">02 把关系写下来</span><h2>记住这一步</h2><p>'+E(lesson.rule)+'</p></div></section>'+
-      '<div class="ph-actions ph-spacer">'+btn('#chapter/'+chapter.id,'打开本章交互实验 ↗','ghost')+'</div>'+
+      (material?textbookSteps(material):'')+
+      (material?.model?experiment(material.model):
+        '<div class="ph-actions ph-spacer">'+btn('#chapter/'+chapter.id,'打开本章交互实验 ↗','ghost')+'</div>')+
       answerBox(question,'lesson',selected)+
       (guide.length?'<section class="ph-panel"><h2>这个考点怎么考</h2><ul>'+guide.map(item=>
         '<li><a href="#question/'+item.id+'">'+E(item.title)+'</a></li>').join('')+'</ul></section>':'')+
@@ -236,7 +283,8 @@
 
   function sourcePage(){
     const references=S.references;
-    return page(heading('教材与试卷','资料来源')+'<section class="ph-panel"><p>课程按人教版教材目录组织。情境讲解和随堂自测为本站编写。广东卷导练从原题拆出一个步骤，题旁保留年份、题号和原卷入口。</p><ul class="ph-lesson-list">'+
+    const source=T?'物理课程按人民教育出版社六册教材逐节编排。页码以书上印刷数字为准。课本例题和实验导读用自己的话重述题意，保留例题编号、题中数据和原书页码。':'课程按人教版教材目录组织。情境讲解和随堂自测为本站编写。';
+    return page(heading('教材与试卷','资料来源')+'<section class="ph-panel"><p>'+E(source)+' 广东卷导练从原题拆出一个步骤，题旁保留年份、题号和原卷入口。</p><ul class="ph-lesson-list">'+
       references.map(([title,url])=>'<li><a href="'+E(url)+'" target="_blank" rel="noopener">'+E(title)+' ↗</a></li>').join('')+'</ul></section>');
   }
 
@@ -245,7 +293,7 @@
     let html;
     switch(view){
       case 'home': html=home(); break;
-      case 'book': if(B(id)) html=bookPage(B(id)); break;
+      case 'book': if(B(id)) html=bookPage(B(id),p); break;
       case 'chapter': if(H(id)) html=chapterPage(H(id)); break;
       case 'lesson': if(L(id)) html=lessonPage(L(id)); break;
       case 'bank': html=bank(p); break;
@@ -270,6 +318,8 @@
     $('#ph-menu').setAttribute('aria-expanded','false');
     render();
     window.scrollTo(0,0);
+    const focus=$('#ph-book-match')||(route().p.get('review')==='1'?$('#ph-book-review'):null);
+    focus?.focus();
   }
 
   function start(scope) {
@@ -305,7 +355,9 @@
     }
     if(button.dataset.phRetry){
       retry.add(button.dataset.phRetry);
-      render();
+      if(T&&route().view==='lesson') {
+        $('#ph-question').outerHTML=answerBox(Q(button.dataset.phRetry),'lesson');
+      }else render();
       $('#ph-question input')?.focus();
     }
     if(button.hasAttribute('data-ph-next')){
@@ -379,6 +431,8 @@
         round.answers.push(option);
         $('#ph-round-question').innerHTML=answerBox(question,'round',option)+
           '<button class="btn primary" data-ph-next>'+ (round.answers.length===round.ids.length?'查看本轮结果':'下一道')+' →</button>';
+      }else if(T&&form.dataset.mode==='lesson') {
+        $('#ph-question').outerHTML=answerBox(question,'lesson',option);
       }else render();
       save();
       $('.ph-feedback')?.focus();

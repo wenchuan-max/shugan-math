@@ -1,1 +1,37 @@
 body[data-subject="physics"] { --ph-ink:#172d44; --ph-main:#274f73; --ph-line:#d7e2eb; --ph-pale:#ebf3f8; }
+.ph-textbook-link { margin:-11px 0 16px; }
+.ph-textbook-link a { font-weight:650; }
+.ph-page-lookup { margin:0 0 18px; }
+.ph-page-form { display:flex; flex-wrap:wrap; align-items:center; gap:10px 12px; margin-top:12px; }
+.ph-page-form label { color:var(--ph-main); font-weight:650; }
+.ph-page-form input { box-sizing:border-box; width:6.5rem; min-height:44px; padding:8px 10px; border:1px solid #b9cad8; border-radius:9px; font:inherit; color:inherit; background:white; }
+.ph-page-match { padding:12px 16px; margin-top:14px; border-radius:12px; background:var(--ph-pale); }
+.ph-page-match h3,.ph-page-match p { margin:4px 0; }
+.ph-page-match a { color:var(--ph-main); text-decoration:underline; }
+.ph-book-review { scroll-margin-top:76px; }
+.ph-book-extras details { border-top:1px solid var(--ph-line); padding:10px 0; }
+.ph-book-extras summary { font-weight:650; }
+.ph-book-extras summary small { font-weight:400; margin-inline-start:6px; }
+.ph-book-extras details p { margin:6px 0 0; }
+.ph-textbook-steps ol { padding-inline-start:1.65em; margin:11px 0 16px; }
+.ph-textbook-steps li { padding-inline-start:.25em; margin:0 0 8px; }
+.ph-textbook-steps li::marker { color:var(--ph-main); font-weight:750; }
+.ph-textbook-reveal { background:var(--ph-pale); border-radius:10px; margin:8px 0 0; }
+.ph-textbook-reveal summary { padding:10px 12px; font-weight:650; }
+.ph-textbook-reveal summary span { display:block; font-size:12px; font-weight:500; margin-bottom:2px; }
+.ph-textbook-reveal p { margin:0; padding:0 12px 12px; }
+.ph-book-activity { border-inline-start:3px solid #a65026; }
+.ph-book-activity h2 { line-height:1.35; }
+.ph-experiment .ph-chart-frame p:empty { display:none; }
+.ph-diagram text { font-size:17px; }
+.ph-diagram-paper { fill:#fffefa; stroke:#bdcddb; stroke-width:1.6; }
+.ph-diagram-dot { fill:#315a77; }
+.ph-diagram-vector { stroke:#275f89; stroke-width:3.5; }
+.ph-diagram-result { stroke:#a84d26; stroke-width:3.5; }
+.ph-diagram-vector,.ph-diagram-result { stroke-linecap:round; stroke-linejoin:round; }
+.ph-diagram-dash { stroke:#748b9c; stroke-width:1.6; stroke-dasharray:5 4; }
+.ph-diagram-alt { stroke:#966122; stroke-width:2; stroke-dasharray:8 5; }
+.ph-comparison-dot { fill:#966122; stroke:white; stroke-width:1.5; }
+.ph-diagram-magnet { fill:#f2d8c3; stroke:#a65026; stroke-width:1.5; }
+.ph-fringe-screen { fill:#142b42; }
+.ph-light-fringe { fill:#f0d698; }
